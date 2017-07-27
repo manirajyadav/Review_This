@@ -3,7 +3,13 @@ from forms import SignUpForm, LoginForm, PostForm
 from models import UserModel, SessionToken, PostModel
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime
+from imgurpython import ImgurClient
+from InstaClone.settings import BASE_DIR
 from django.utils import timezone
+
+
+imgur_CLIENT_ID = "1109a24b0f3855a"
+imgur_CLIENT_SECRET = "75c71f0fa4ba69f4f6e6a6a10efa69003d3386a1"
 
 
 def signup_view(request):
@@ -35,7 +41,7 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-
+            
             user= UserModel.objects.filter(username=username).first()
 
             if user:
@@ -75,6 +81,10 @@ def post_view(request):
             caption = form.cleaned_data.get( 'caption' )
 
             post = PostModel( user=user, image=image, caption=caption )
+            post.save()
+            path = str( BASE_DIR + post.image.url )
+            client = ImgurClient( imgur_CLIENT_ID, imgur_CLIENT_SECRET)
+            post.image_url = client.upload_from_path( path, anon=True )['link']
             post.save()
 
     return render( request, 'post.html', {'form': form} )
