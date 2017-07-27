@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from forms import SignUpForm, LoginForm
-from models import UserModel, SessionToken
+from forms import SignUpForm, LoginForm, PostForm
+from models import UserModel, SessionToken, PostModel
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime
 from django.utils import timezone
@@ -43,7 +43,7 @@ def login_view(request):
                     token = SessionToken( user=user )
                     token.create_token()
                     token.save()
-                    response = redirect('feed/')
+                    response = redirect('/feed/')
                     response.set_cookie( key='session_token', value=token.session_token )
                     return response
                 else:
@@ -52,11 +52,35 @@ def login_view(request):
                 response_data['message']= 'User Does Not Exist'
 
 
-    elif request.method == 'GET':
+    else:
         form = LoginForm()
 
     response_data['form']= form
+
     return render(request, 'login.html', response_data)
+
+
+def post_view(request):
+  user = check_validation(request)
+
+  if user:
+    if request.METHOD == 'GET':
+      form = PostForm()
+
+
+    elif request.METHOD == 'POST':
+        form = PostForm( request.POST, request.FILES )
+        if form.is_valid():
+            image = form.cleaned_data.get( 'image' )
+            caption = form.cleaned_data.get( 'caption' )
+
+            post = PostModel( user=user, image=image, caption=caption )
+            post.save()
+
+    return render( request, 'post.html', {'form': form} )
+
+  else:
+    return redirect('/login/')
 
 
 def feed_view(request):

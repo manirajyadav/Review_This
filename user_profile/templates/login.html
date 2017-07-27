@@ -3,23 +3,22 @@
 <head>
     <style type = "text/css">
         body {
-                 background-image : url("/static/instaclone.jpg");
-                 background-repeat: no-repeat;
-                 background-size: cover;
+                 background-image : url("/static/image.png");
+                background-repeat: no-repeat;
+                background-size: cover;
+                padding: 50px;
+                background-position:0px 5px;
              }
 
         .main{
                 text-align: center;
                 font-weight : bold;
                 font-style : italic;
-                color : white;
-
-                padding: 40px;
+                padding: 50px;
              }
         div {
             text-align : center;
             line-height: 200%;
-            color: white;
             }
 
 
@@ -29,7 +28,7 @@
 </head>
 <body>
     <div class="main">
-            <h1> Instagram Clone</h1>
+            <h1> Review This!</h1>
             <h3>Login</h3>
     </div>
 
@@ -38,9 +37,12 @@
             {% csrf_token %}
             {{response_data}}
 
+
+
           <div>
               <label for="username">Username: </label>
               <input id="username" type="text" name="username" value={{ username }}>
+
           </div>
 
           <div>
@@ -51,6 +53,8 @@
           <input type="submit" value="Log In">
 
         </form>
+
+        <div class="log"><h3>Already a user?</h3><a href="post/">post</a> </div>
 
 
     </div>
