@@ -6,7 +6,7 @@ import uuid, datetime
 
 
 class UserModel(models.Model):
-    name = models.CharField(max_length=120,unique=True, null=False, blank=False)
+    name = models.CharField(max_length=120, null=False, blank=False)
     email = models.EmailField(null=True)
     username = models.CharField( max_length=120,unique=True, null=False, blank=False)
     password = models.CharField( max_length=120)

@@ -41,7 +41,7 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            
+
             user= UserModel.objects.filter(username=username).first()
 
             if user:
@@ -49,7 +49,7 @@ def login_view(request):
                     token = SessionToken( user=user )
                     token.create_token()
                     token.save()
-                    response = redirect('/feed/')
+                    response = redirect('/post/')
                     response.set_cookie( key='session_token', value=token.session_token )
                     return response
                 else:
@@ -70,11 +70,11 @@ def post_view(request):
   user = check_validation(request)
 
   if user:
-    if request.METHOD == 'GET':
+    if request.method == 'GET':
       form = PostForm()
 
 
-    elif request.METHOD == 'POST':
+    elif request.method == 'POST':
         form = PostForm( request.POST, request.FILES )
         if form.is_valid():
             image = form.cleaned_data.get( 'image' )
