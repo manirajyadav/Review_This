@@ -1,10 +1,74 @@
+{% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<style>
+    body {
+        background-image:url("/static/download.jpg");
+
+        background-repeat: repeat-y;
+        background-size: contain;
+    }
+   .container {
+     color: white;
+      margin-top: 50px;
+      padding:30px 25px;
+
+
+      }
+     a{
+         color: white;
+         float: right;
+         font-size: large;
+         font-weight: bolder;
+         text-decoration: none;
+
+     }
+    #new {
+        position: fixed;
+        top: 10px;
+         right: 5px;
+    }
+
+    #out {
+        position: fixed;
+        top: 40px;
+         right: 5px;
+    }
+
+</style>
 <body>
-   make feed page
-</body>
-</html>
+    <form method="post" >
+        {% csrf_token %}
+        <div id="new">
+            <a href="/post/">Create A New Post</a>
+        </div>
+
+
+        <div id="out">
+            <a href="/logout/">Logout</a>
+        </div>
+
+    </form>
+
+    <div align="left" style="font-size: 400%; color: white; font-weight: bolder; position: fixed; top:0" >
+        Review This!
+    </div>
+
+    <div class="container" align="center" style="top: 40px">
+
+    {% for post in posts %}
+
+
+        <h3> Posted by: {{ post.user.username }} </h3>
+        <p>[{{ post.created_on }}]</p>
+        <img style="display:inline-block; width:350px; height:300px;"
+             src="{{ post.image_url }}"/><br>
+
+        <span  style="display:inline-block;">{{ post.caption }}</span><br/><br/>
+    {% endfor %}
+    </div>

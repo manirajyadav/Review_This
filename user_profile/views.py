@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
+
 from forms import SignUpForm, LoginForm, PostForm
 from models import UserModel, SessionToken, PostModel
 from django.contrib.auth.hashers import make_password, check_password
-from datetime import datetime
+from datetime import datetime, timedelta
 from imgurpython import ImgurClient
 from InstaClone.settings import BASE_DIR
 from django.utils import timezone
@@ -36,6 +37,7 @@ def signup_view(request):
 
 def login_view(request):
     response_data = {}
+    response_data['message']= ' Fill in your details.'
     if request.method == "POST":
         form = LoginForm( request.POST )
         if form.is_valid():
@@ -49,13 +51,13 @@ def login_view(request):
                     token = SessionToken( user=user )
                     token.create_token()
                     token.save()
-                    response = redirect('/post/')
+                    response = redirect('/feed/')
                     response.set_cookie( key='session_token', value=token.session_token )
                     return response
                 else:
                     response_data['message'] = 'Incorrect Password! Please try again!'
             else:
-                response_data['message']= 'User Does Not Exist'
+                response_data['message']= 'Sorry! The User You Entered Does Not Exist.'
 
 
     else:
@@ -82,10 +84,11 @@ def post_view(request):
 
             post = PostModel( user=user, image=image, caption=caption )
             post.save()
-            path = str( BASE_DIR + post.image.url )
+            path = str( BASE_DIR +"/"+ post.image.url )
             client = ImgurClient( imgur_CLIENT_ID, imgur_CLIENT_SECRET)
             post.image_url = client.upload_from_path( path, anon=True )['link']
             post.save()
+            return redirect( '/feed/' )
 
     return render( request, 'post.html', {'form': form} )
 
@@ -94,7 +97,19 @@ def post_view(request):
 
 
 def feed_view(request):
-    return render( request, 'feed.html' )
+
+    user = check_validation( request )
+    if user:
+        posts = PostModel.objects.all().order_by( '-created_on' )
+        return render(request, 'feed.html',{'posts': posts})
+    else:
+        return redirect( '/login/' )
+
+def logout_view(request):
+    x= SessionToken.objects.filter( session_token=request.COOKIES.get( 'session_token' ) ).first()
+    x.is_valid= False
+    x.save()
+    return redirect('/login/')
 
 
 # For validating the session
@@ -102,7 +117,11 @@ def check_validation(request):
     if request.COOKIES.get( 'session_token' ):
         session = SessionToken.objects.filter( session_token=request.COOKIES.get( 'session_token' ) ).first()
         if session:
-            return session.user
+            if session.is_valid == True:
+                time_to_live = session.created_on + timedelta( days=1 )
+                if time_to_live > timezone.now():
+                    return session.user
+
     else:
         return None
 
