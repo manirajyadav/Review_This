@@ -8,40 +8,47 @@
 </head>
 <style>
     body {
-        background-image:url("/static/download.jpg");
+        background-image: url("/static/back.jpg");
 
         background-repeat: repeat-y;
         background-size: contain;
     }
    .container {
-     color: white;
-      margin-top: 50px;
+
+      margin-top: 70px;
       padding:30px 25px;
+
 
 
       }
      a{
-         color: white;
+         color: maroon;
          float: right;
          font-size: large;
          font-weight: bolder;
          text-decoration: none;
+         background-color: white;
 
      }
     #new {
         position: fixed;
-        top: 10px;
-         right: 5px;
+        top: 15px;
+        right: 5px;
     }
 
     #out {
         position: fixed;
-        top: 40px;
+        top: 45px;
          right: 5px;
+    }
+    #review {
+        color: maroon;
+
     }
 
 </style>
 <body>
+
     <form method="post" >
         {% csrf_token %}
         <div id="new">
@@ -55,20 +62,63 @@
 
     </form>
 
-    <div align="left" style="font-size: 400%; color: white; font-weight: bolder; position: fixed; top:0" >
+    <div id="review" align="left" style="font-size: 400%; font-weight: bolder; position: fixed; top:0; border-style: solid; background-color: white" >
         Review This!
     </div>
 
-    <div class="container" align="center" style="top: 40px">
+    <div class="container" align="center" >
 
     {% for post in posts %}
 
 
-        <h3> Posted by: {{ post.user.username }} </h3>
-        <p>[{{ post.created_on }}]</p>
-        <img style="display:inline-block; width:350px; height:300px;"
+        <h2>{{ post.user.username }} </h2>
+        <p style="font-size: small">[{{ post.created_on }}]</p>
+        <img style="display:inline-block; width:500px; height:500px;"
              src="{{ post.image_url }}"/><br>
 
-        <span  style="display:inline-block;">{{ post.caption }}</span><br/><br/>
-    {% endfor %}
+        <span  style="display:inline-block;font-size: larger;font-weight: bold">{{ post.caption }}</span><br/><br/>
+
+        <div class="edit" style="padding: 30px;position: relative; text-align: left; left: 32%;">
+         <div style="display:inline-block">
+        {{ post.like_count }} people like this post.
+        </div>
+
+        <form method="POST" action="/like/">
+          {% csrf_token %}
+          <input type="hidden" name="post" value="{{ post.id }}">
+        {% if post.has_liked %}
+
+            <input type="submit" class="btn btn-default" value="Unlike">
+
+        {% else %}
+
+            <input type="submit" class="btn btn-default" value="Like">
+
+        {% endif %}
+
+      </form>
+
+
+        <div>
+
+      {% for comment in post.comments %}
+
+        <p>
+         <span style="font-size: large; font-weight: bold"> {{ comment.user.username }}</span> <span style="font-size: small"> ({{ comment.created_on }})</span>: <span style="font-size: large"> {{ comment.comment_text }}</span>
+             </p>
+
+      {% endfor %}
+
+      </div>
+
+        <form method="POST" action="/comment/">
+            {% csrf_token %}
+          <input type="hidden" name="post" value="{{ post.id }}" >
+          <input type="text" name="comment_text" id="comment_text" placeholder="Make a comment.." value="{{ comment_text }}">
+          {{ comment_text }}
+          <input type="submit" class="btn-default btn" value="Comment">
+        </form>
+            </div>
+            {% endfor %}
     </div>
+
