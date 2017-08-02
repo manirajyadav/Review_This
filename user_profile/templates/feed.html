@@ -75,6 +75,14 @@
         <p style="font-size: small">[{{ post.created_on }}]</p>
         <img style="display:inline-block; width:500px; height:500px;"
              src="{{ post.image_url }}"/><br>
+        <div>
+
+            {% if message == 'Positive' %}
+                <span> Positive :) </span>
+            {% else %}
+                <span>Negative :(</span>
+            {% endif %}
+        </div>
 
         <span  style="display:inline-block;font-size: larger;font-weight: bold">{{ post.caption }}</span><br/><br/>
 

@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from imgurpython import ImgurClient
 from InstaClone.settings import BASE_DIR
 from django.utils import timezone
+from paralleldots import set_api_key, sentiment
+
 
 
 imgur_CLIENT_ID = "1109a24b0f3855a"
@@ -103,10 +105,21 @@ def feed_view(request):
     if user:
         posts = PostModel.objects.all().order_by( '-created_on' )
         for post in posts:
+            set_api_key( 'C2TJEgxONUsOJgbfTRzJZk896mQDzl5aADdNQrYzJrQ' )
+
+            text = post.caption
+            response = sentiment(text)
+            if response['sentiment'] > 0.5:
+                message = 'Positive'
+            else:
+                message = 'Negative'
+
+
+
             existing_like = LikeModel.objects.filter( post_id=post.id, user=user ).exists()
             if existing_like:
                 post.has_liked = True
-        return render(request, 'feed.html',{'posts': posts})
+        return render(request, 'feed.html',{'posts': posts, 'message': message})
     else:
         return redirect( '/login/' )
 
