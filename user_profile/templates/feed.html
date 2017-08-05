@@ -77,10 +77,10 @@
              src="{{ post.image_url }}"/><br>
         <div>
 
-            {% if message == 'Positive' %}
-                <span> Positive :) </span>
+            {% if post.review == 'Positive' %}
+                <span style="font-size: medium; color: green; font-weight: bold"> Positive :) </span>
             {% else %}
-                <span>Negative :(</span>
+                <span style="font-size: medium; color: red; font-weight: bold">Negative :(</span>
             {% endif %}
         </div>
 

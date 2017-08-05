@@ -113,6 +113,7 @@ def post_view(request):
 
 # creating controller to view posts
 def feed_view(request):
+    set_api_key( 'C2TJEgxONUsOJgbfTRzJZk896mQDzl5aADdNQrYzJrQ' )
     # check whether used is logged in
     user = check_validation( request )
     if user:
@@ -121,21 +122,23 @@ def feed_view(request):
         # iterating through all posts
         for post in posts:
             # setting api for parallel dots to analyse sentiments
-            set_api_key( 'C2TJEgxONUsOJgbfTRzJZk896mQDzl5aADdNQrYzJrQ' )
-
+            message = []
             # checking whether comment is positive or negative
-            response = sentiment(post.caption)
 
-            if response['sentiment'] > 0.5:
-                message = 'Positive'
-            else:
-                message = 'Negative'
+            if post.caption!= None:
+
+                response = sentiment(str(post.caption))
+
+                if response['sentiment'] >= 0.5:
+                    post.review = 'Positive'
+                elif response['sentiment']< 0.5:
+                    post.review = 'Negative'
             # checking for existing like
             existing_like = LikeModel.objects.filter( post_id=post.id, user=user ).exists()
             if existing_like:
                 post.has_liked = True
         # redirecting to feeds
-        return render(request, 'feed.html',{'posts': posts, 'message': message})
+        return render(request, 'feed.html',{'posts': posts})
     # if user not logged in
     else:
         return redirect( '/login/' )

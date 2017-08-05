@@ -33,6 +33,7 @@ class PostModel(models.Model):
   created_on = models.DateTimeField(auto_now_add=True)
   updated_on = models.DateTimeField(auto_now=True)
   has_liked = False
+  review = models.CharField(max_length=120, default="")
   # couting likes
   @property
   def like_count(self):
