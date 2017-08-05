@@ -1,5 +1,3 @@
-{% load staticfiles %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,15 +11,8 @@
         background-repeat: repeat-y;
         background-size: contain;
     }
-   .container {
 
-      margin-top: 70px;
-      padding:30px 25px;
-
-
-
-      }
-     a{
+    a{
          color: maroon;
          float: right;
          font-size: large;
@@ -30,58 +21,34 @@
          background-color: white;
 
      }
-    #search {
+
+    #new {
         position: fixed;
         top: 15px;
         right: 5px;
     }
 
-    #out {
-        position: fixed;
-        top: 75px;
-         right: 5px;
-    }
-
-    #new {
-        position: fixed;
-        top: 45px;
-         right: 5px;
-    }
     #review {
         color: maroon;
 
     }
 
-</style>
+    </style>
 <body>
-
-    <form method="post" >
-        {% csrf_token %}
-        <div id="new">
-            <a href="/post/">Create A New Post</a>
-        </div>
-
-        <div id="search">
-            <a href="/search/">Search</a>
-        </div>
-
-
-        <div id="out">
-            <a href="/logout/">Logout</a>
-        </div>
-
-    </form>
-
     <div id="review" align="left" style="font-size: 400%; font-weight: bolder; position: fixed; top:0; border-style: solid; background-color: white" >
         Review This!
     </div>
 
-    <div class="container" align="center" >
+    <div id="new">
+            <a href="/feed/">Back To Feeds</a>
+        </div>
+
+    <div class="container" align="center" style="margin-top: 70px;padding:30px 25px;">
 
     {% for post in posts %}
 
 
-        <h2>{{ post.user.username }} </h2>
+        <h1>{{ post.user.username}} </h1>
         <p style="font-size: small">[{{ post.created_on }}]</p>
         <img style="display:inline-block; width:500px; height:500px;"
              src="{{ post.image_url }}"/><br>
@@ -140,3 +107,6 @@
             {% endfor %}
     </div>
 
+
+</body>
+</html>

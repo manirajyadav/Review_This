@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm
+from forms import SignUpForm, LoginForm, PostForm, LikeForm, CommentForm, SearchForm
 from models import UserModel, SessionToken, PostModel, LikeModel, CommentModel
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime, timedelta
@@ -113,7 +113,7 @@ def post_view(request):
 
 # creating controller to view posts
 def feed_view(request):
-    set_api_key( 'C2TJEgxONUsOJgbfTRzJZk896mQDzl5aADdNQrYzJrQ' )
+
     # check whether used is logged in
     user = check_validation( request )
     if user:
@@ -122,7 +122,7 @@ def feed_view(request):
         # iterating through all posts
         for post in posts:
             # setting api for parallel dots to analyse sentiments
-            message = []
+            set_api_key( 'C2TJEgxONUsOJgbfTRzJZk896mQDzl5aADdNQrYzJrQ' )
             # checking whether comment is positive or negative
 
             if post.caption!= None:
@@ -149,6 +149,26 @@ def logout_view(request):
     x.save()
     # redirecting to login page
     return redirect('/login/')
+
+def search_view(request):
+    # check whether used is logged in
+    user = check_validation( request )
+    if user:
+        if request.method == "POST":
+            form = SearchForm(request.POST)
+            # checking for valid form
+            if form.is_valid():
+                username = form.cleaned_data['username']
+                x = UserModel.objects.filter (username= username)
+                posts = PostModel.objects.filter(user =x ).order_by( '-created_on' )
+                if posts:
+                    return render(request, 'user.html', {'posts': posts} )
+        else:
+            form = SearchForm()
+
+        # redirecting to feeds
+        return render( request,'search.html', {'form': form} )
+
 # controller for liking a post
 def like_view(request):
     # checking whether user is logged in

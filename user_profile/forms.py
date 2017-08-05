@@ -30,3 +30,6 @@ class CommentForm(forms.ModelForm):
   class Meta:
     model = CommentModel
     fields = ['comment_text', 'post']
+
+class SearchForm(forms.Form):
+    username = forms.CharField( max_length=120 )
