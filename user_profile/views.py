@@ -8,6 +8,8 @@ from imgurpython import ImgurClient
 from InstaClone.settings import BASE_DIR
 from django.utils import timezone
 from paralleldots import set_api_key, sentiment
+from django.contrib import messages
+
 
 
 # saving imgur client id and secret in variables
@@ -16,6 +18,7 @@ imgur_CLIENT_SECRET = "75c71f0fa4ba69f4f6e6a6a10efa69003d3386a1"
 
 # creating controller for signing in
 def signup_view(request):
+    message = 'Fill in Your details and SingUp'
     today = datetime.now()
     if request.method == "POST":
         form = SignUpForm( request.POST )
@@ -25,17 +28,21 @@ def signup_view(request):
             name = form.cleaned_data['name']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            # saving data to DB
-            # making password hashed in database
-            user = UserModel( name=name, password=make_password(password), email=email, username=username )
-            user.save()
-            return render(request, 'success.html')
-            # return redirect('login/')
+            if len(username) >= 4 and len(password)>=5:
+                # saving data to DB
+                # making password hashed in database
+                user = UserModel( name=name, password=make_password(password), email=email, username=username )
+                user.save()
+                # return redirect('success page')
+                return render(request, 'success.html')
+            else:
+                message = "Username or Password too short! Try again!"
+
     # else if request is get
     else:
         form = SignUpForm()
     # redirecting to index.html
-    return render(request, 'index.html', {'form': form,'today': today})
+    return render(request, 'index.html', {'form': form,'today': today, 'message': message})
 
 # creating controller for login
 def login_view(request):
@@ -102,8 +109,13 @@ def post_view(request):
             client = ImgurClient( imgur_CLIENT_ID, imgur_CLIENT_SECRET)
             post.image_url = client.upload_from_path( path, anon=True )['link']
             post.save()
+            if post:
+                messages='Your post has been created successfully! Happy Reviewing!'
+            else:
+                messages='Unable to create your post.Try again!'
+
             # redirecting to feeds
-            return redirect( '/feed/' )
+            return render( request, 'post_success.html', {'message': messages} )
 
 
     return render( request, 'post.html', {'form': form} )

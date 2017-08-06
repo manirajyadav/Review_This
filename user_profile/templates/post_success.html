@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            background-image :linear-gradient(to right, black 0%, white 100%), url("/static/image.png");
+            background-blend-mode: screen ;
+        }
+
+        a{
+         color: maroon;
+         float: right;
+         font-size: large;
+         font-weight: bolder;
+         text-decoration: none;
+         background-color: white;
+
+     }
+
+    #new {
+        position: fixed;
+        top: 15px;
+        right: 5px;
+    }
+
+        #review {
+        color: maroon;
+
+    }
+
+
+    </style>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <div id="review" align="left" style="font-size: 400%; font-weight: bolder; position: fixed; top:0; border-style: solid; background-color: white" >
+        Review This!
+
+    </div>
+
+    <div id="new">
+            <a href="/feed/">Back To Feeds</a>
+        </div>
+
+    <div align="center" style="margin-top: 10%; font-weight: bold; font-size: large">
+        {{message}}
+    </div>
+
+</body>
+</html>
