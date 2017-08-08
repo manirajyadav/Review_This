@@ -8,7 +8,12 @@ from imgurpython import ImgurClient
 from InstaClone.settings import BASE_DIR
 from django.utils import timezone
 from paralleldots import set_api_key, sentiment
-from django.contrib import messages
+import sendgrid
+from sendgrid.helpers.mail import *
+
+sg_api = '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'
+my_client = sendgrid.SendGridAPIClient(apikey=sg_api)
+
 
 
 
@@ -34,6 +39,16 @@ def signup_view(request):
                 user = UserModel( name=name, password=make_password(password), email=email, username=username )
                 user.save()
                 # return redirect('success page')
+
+                sg = sendgrid.SendGridAPIClient( apikey=sg_api )  # sending email to creator of post informing
+                # their post is liked using sendgrid
+                from_email = Email( "review_this@gmail.com" )
+                to_email = Email(user.email)
+                subject = "Welcome!!"
+                content = Content( 'Welcome to our life changing website Review This. You have successfully signed up. ')
+                mail = Mail( from_email, subject, to_email, content )
+                response = sg.client.mail.send.post( request_body=mail.get() )
+                print response
                 return render(request, 'success.html')
             else:
                 message = "Username or Password too short! Try again!"
@@ -196,6 +211,20 @@ def like_view(request):
             # if hasent liked before then make a like
             if not existing_like:
                 LikeModel.objects.create(post_id=post_id, user=user)
+                a= PostModel.objects.filter(id= post_id)
+                b = a[0].user  # accessing user attribute of PostModel object a
+                c = b.email
+                d = user.username  # accessing username of the creator of that post which is liked
+                e = str( a[0].image )
+                sg = sendgrid.SendGridAPIClient( apikey=sg_api )  # sending email to creator of post informing
+                # their post is liked using sendgrid
+                from_email = Email( "review_this@gmail.com" )
+                to_email = Email(b)
+                subject = "Your post has been liked"
+                content = Content ("text/plain", "Your post " + e + " on Review This Website is liked by " + d)
+                mail = Mail( from_email, subject, to_email, content )
+                response = sg.client.mail.send.post( request_body=mail.get() )
+                print response
             # liked before then delete the like
             else:
                 existing_like.delete()
@@ -220,6 +249,23 @@ def comment_view(request):
             # saving in database
             comment = CommentModel.objects.create( user=user, post_id=post_id, comment_text=comment_text )
             comment.save()
+            # get PostModel object with post id of the post which is liked
+            a = CommentModel.objects.filter(id=post_id )
+            b = a[0].user  # accessing user attribute of CommentModel object a
+            c = b.email  # accessing email of the creator of that post on which comment is made
+            d = user.username  # accessing username of the creator of that post on which comment is made
+            e = str( a[0].comment_text )  # get the comment made on the post
+            f = str( b.image )
+
+            sg = sendgrid.SendGridAPIClient( apikey=sg_api )  # sending email to creator of post informing
+            # their post is liked using sendgrid
+            from_email = Email( "review_this@gmail.com" )
+            to_email = Email( c )
+            subject = "You've got a comment on your post"
+            content = Content( "text/plain","The comment " + e + " is made on your post " + f + " on Review This Website by " + d )
+            mail = Mail( from_email, subject, to_email, content )
+            response = sg.client.mail.send.post( request_body=mail.get() )
+
             # redirecting to feeds
             return redirect( '/feed/' )
         else:
